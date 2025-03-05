@@ -96,9 +96,10 @@ public class CarConsumerWithSubscriptionTask extends Thread {
 						if (SubscriberConstants.PUBLISHER_DESTROYED_EVENT_TYPE.equalsIgnoreCase(event.getEventType())) {
 							if (reorchestration) {
 								logger.info("Recieved publisher destroyed event - started reorchestration.");
-								logger.info("Temperature: " + event.getPayload() + "Cº");
+								
 							} else {
 								logger.info("Recieved publisher destroyed event - started shuting down.");
+								logger.info("Temperature: " + event.getPayload() + "Cº");
 								System.exit(0);
 							}
 						} else {
