@@ -21,7 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.aitia.arrowhead.application.library.ArrowheadService;
 import ai.aitia.arrowhead.application.library.config.ApplicationInitListener;
@@ -144,9 +149,26 @@ public class CarProviderWithPublishingApplicationInitListener extends Applicatio
 			source.setAuthenticationInfo(Base64.getEncoder().encodeToString( arrowheadService.getMyPublicKey().getEncoded()));
 		}
 
+		// Make a GET request to the endpoint
+		RestTemplate restTemplate = new RestTemplate();
+		String url = "http://localhost:8082/registry/api/v1/registry/TemperatureSensorID/submodels";
+		ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+		String submodelId = "0";
+
+		// Parse the JSON response to get submodel.identification.id
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode root = objectMapper.readTree(response.getBody());
+			submodelId = root.path("submodel").path("identification").path("id").asText();
+			logger.info("Submodel Identification ID: " + submodelId);
+		} catch (Exception e) {
+			logger.error("Error parsing JSON response", e);
+		}
+
 		final Map<String,String> metadata = null;
-		int randomTemperature = 19 + (int)(Math.random() * ((30 - 19) + 1));
-		final String payload = String.valueOf(randomTemperature);
+
+		final String payload = String.valueOf(submodelId);
 		final String timeStamp = Utilities.convertZonedDateTimeToUTCString( ZonedDateTime.now() );
 		
 		final EventPublishRequestDTO publishRequestDTO = new EventPublishRequestDTO(
