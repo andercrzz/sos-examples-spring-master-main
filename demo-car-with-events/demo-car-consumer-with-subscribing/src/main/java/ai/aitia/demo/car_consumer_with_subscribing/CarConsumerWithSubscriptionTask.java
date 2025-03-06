@@ -100,7 +100,7 @@ public class CarConsumerWithSubscriptionTask extends Thread {
 							} else {
 								logger.info("Recieved publisher destroyed event - started shuting down.");
 								logger.info("Temperature: " + event.getPayload() + "Cº");
-								System.exit(0);
+								//System.exit(0);
 							}
 						} else {
 							logger.info("ConsumerTask recevied event - with type: " + event.getEventType() + ", and payload: " + event.getPayload() + ".");
