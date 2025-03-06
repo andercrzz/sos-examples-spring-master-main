@@ -106,7 +106,7 @@ public class CarConsumerWithSubscriptionTask extends Thread {
 								logger.info("Recieved publisher destroyed event - started shuting down.");
 								logger.info("Temperature: " + event.getPayload() + "Cº");
 
-								if(Integer.parseInt(event.getPayload()) > 30 || Integer.parseInt(event.getPayload()) < 10) {
+								if(Integer.parseInt(event.getPayload()) > 30 || Integer.parseInt(event.getPayload()) < 17) {
 
 									String value = "ON";
 									if(Integer.parseInt(event.getPayload()) > 30) {
