@@ -13,6 +13,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.aitia.arrowhead.application.library.ArrowheadService;
 import ai.aitia.arrowhead.application.library.util.ApplicationCommonConstants;
@@ -100,6 +105,35 @@ public class CarConsumerWithSubscriptionTask extends Thread {
 							} else {
 								logger.info("Recieved publisher destroyed event - started shuting down.");
 								logger.info("Temperature: " + event.getPayload() + "Cº");
+
+								if(Integer.parseInt(event.getPayload()) > 30 || Integer.parseInt(event.getPayload()) < 10) {
+									// Make a GET request to the endpoint
+									RestTemplate restTemplate = new RestTemplate();
+									String url = "http://localhost:8082/registry/api/v1/registry/HeaterID/submodels";
+									ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+									String submodelId = "0";
+
+									logger.info(response.getBody());
+
+									// Parse the JSON response to get submodel.identification.id
+									try {
+										ObjectMapper objectMapper = new ObjectMapper();
+										JsonNode root = objectMapper.readTree(response.getBody());
+										if (root.isArray() && root.size() > 0) {
+											JsonNode firstElement = root.get(0);
+											submodelId = firstElement.path("value").asText();
+											logger.info("Status of the sumbmodel changed to: " + submodelId);
+										} else {
+											logger.warn("No submodel found in the response");
+										}
+									} catch (Exception e) {
+										logger.error("Error parsing JSON response", e);
+									}
+								} else {
+									logger.info("Temperature is normal. Heater is working fine.");
+
+								}
 								//System.exit(0);
 							}
 						} else {

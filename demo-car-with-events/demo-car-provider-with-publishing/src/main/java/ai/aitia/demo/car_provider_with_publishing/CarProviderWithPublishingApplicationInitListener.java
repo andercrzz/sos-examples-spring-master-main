@@ -164,7 +164,7 @@ public class CarProviderWithPublishingApplicationInitListener extends Applicatio
 			JsonNode root = objectMapper.readTree(response.getBody());
 			if (root.isArray() && root.size() > 0) {
 				JsonNode firstElement = root.get(0);
-				submodelId = firstElement.path("identification").path("id").asText();
+				submodelId = firstElement.path("value").asText();
 				logger.info("Submodel Identification ID: " + submodelId);
 			} else {
 				logger.warn("No submodel found in the response");
