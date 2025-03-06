@@ -156,11 +156,13 @@ public class CarProviderWithPublishingApplicationInitListener extends Applicatio
 
 		String submodelId = "0";
 
+		logger.info(response.getBody());
+
 		// Parse the JSON response to get submodel.identification.id
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			JsonNode root = objectMapper.readTree(response.getBody());
-			submodelId = root.path("submodel").path("identification").path("id").asText();
+			submodelId = root.path("identification").path("id").asText();
 			logger.info("Submodel Identification ID: " + submodelId);
 		} catch (Exception e) {
 			logger.error("Error parsing JSON response", e);
