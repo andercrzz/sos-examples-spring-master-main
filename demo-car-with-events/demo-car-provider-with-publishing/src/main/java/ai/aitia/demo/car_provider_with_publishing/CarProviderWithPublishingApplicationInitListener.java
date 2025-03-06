@@ -12,6 +12,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -97,6 +99,17 @@ public class CarProviderWithPublishingApplicationInitListener extends Applicatio
 		if (arrowheadService.echoCoreSystem(CoreSystem.EVENTHANDLER)) {
 			arrowheadService.updateCoreServiceURIs(CoreSystem.EVENTHANDLER);	
 		}
+
+		
+		// Start a new thread to run publishDestroyedEvent() every 10 seconds
+		Timer timer = new Timer(true);
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				publishDestroyedEvent();
+				logger.info("Sending event to event handler");
+			}
+		}, 0, 5000);
 	}
 	
 	//-------------------------------------------------------------------------------------------------
