@@ -162,8 +162,13 @@ public class CarProviderWithPublishingApplicationInitListener extends Applicatio
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			JsonNode root = objectMapper.readTree(response.getBody());
-			submodelId = root.path("identification").path("id").asText();
-			logger.info("Submodel Identification ID: " + submodelId);
+			if (root.isArray() && root.size() > 0) {
+				JsonNode firstElement = root.get(0);
+				submodelId = firstElement.path("identification").path("id").asText();
+				logger.info("Submodel Identification ID: " + submodelId);
+			} else {
+				logger.warn("No submodel found in the response");
+			}
 		} catch (Exception e) {
 			logger.error("Error parsing JSON response", e);
 		}
